@@ -1,0 +1,24 @@
+{
+  "name": "fanmesh",
+  "version": "0.1.0",
+  "description": "FanMesh - P2P fan network (Pears) + on-device AI commentator (QVAC). Tether Developers Cup.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./bin/fanmesh.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "autobase": "^7.28.1",
+    "b4a": "^1.8.1",
+    "corestore": "^7.11.0",
+    "hypercore": "^11.33.5",
+    "hypercore-crypto": "^3.7.0",
+    "hyperdrive": "^13.3.2",
+    "hyperswarm": "^4.17.0",
+    "random-access-memory": "^6.2.1"
+  }
+}

@@ -1,0 +1,21 @@
+node_modules/
+*.log
+.DS_Store
+.env
+.env.local
+
+# FanMesh runtime data (peer storage — generated per device)
+storage/
+.storage/
+*.core
+corestore/
+data/
+
+# Build output
+dist/
+build/
+
+# OS / editor
+Thumbs.db
+.vscode/
+.idea/
