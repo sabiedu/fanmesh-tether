@@ -12,13 +12,17 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
+    "@hyperswarm/dht": "^6.5.1",
+    "@qvac/sdk": "^0.14.1",
     "autobase": "^7.28.1",
     "b4a": "^1.8.1",
+    "blind-pairing-core": "^2.10.1",
     "corestore": "^7.11.0",
     "hypercore": "^11.33.5",
     "hypercore-crypto": "^3.7.0",
     "hyperdrive": "^13.3.2",
     "hyperswarm": "^4.17.0",
-    "random-access-memory": "^6.2.1"
+    "random-access-memory": "^6.2.1",
+    "ws": "^8.21.0"
   }
 }
