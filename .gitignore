@@ -10,6 +10,8 @@ storage/
 *.core
 corestore/
 data/
+data-test-*/
+tmp/
 
 # Build output
 dist/
@@ -19,3 +21,11 @@ build/
 Thumbs.db
 .vscode/
 .idea/
+
+# Local working notes / doc snapshots (not shipped)
+*_docs.md
+*_docs_snapshot.md
+fanmesh-run.log
+fanmesh-err.log
+fanmesh-bob.log
+fanmesh-bob-err.log
