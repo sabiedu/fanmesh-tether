@@ -40,17 +40,38 @@ During the World-Cup moment, central chat servers overload and fans in some regi
 ## Status
 
 - ✅ **Milestone 1** — Hyperswarm peer discovery verified (two peers find each other + exchange messages over the DHT, no server).
-- 🚧 Milestone 2 — Hypercore/Autobase chat + room state + clip sync.
-- 🚧 Milestone 3 — QVAC on-device commentator.
-- 🚧 Milestone 4 — Pear app + UI + demo video.
+- ✅ **Milestone 2** — Autobase multi-writer chat (both directions) + reactions + **Hypercore clip sync (symmetric, byte-identical)** + eventual consistency. All P2P, no server.
+- ✅ **Milestone 3** — QVAC on-device commentator runs a real Llama 3.2 1B model locally (no cloud) and generates live multilingual commentary on match events.
+- 🚧 Milestone 4 — Web UI + demo video (in progress).
 
 ## Quick start
 
 ```bash
 npm install
-# Milestone 1 smoke test: two peers discover each other peer-to-peer
-node test/run-mesh-test.mjs
+
+# Full P2P integration test: two peers discover each other, Autobase multi-writer
+# chat BOTH ways, reactions sync, Hypercore clip sync symmetric + eventual consistency.
+node test/mesh-test.mjs
+
+# QVAC on-device commentator: loads a local model and narrates match events (no cloud).
+node test/commentator-test.mjs
 ```
+
+## Run the app
+
+Two fans each run this on the same match key and meet inside the room — no server, no cloud.
+
+```bash
+# Fan A (laptop)
+npm start
+# → opens http://127.0.0.1:3000
+
+# Fan B (phone / second machine)
+node bin/fanmesh.js --match "WC-FINAL-ARG-FRA" --name Bob --lang Español --port 3001
+# → opens http://127.0.0.1:3001
+```
+
+Both fans discover each other over Hyperswarm, chat via Autobase, sync clips via Hypercore, and each runs a private on-device AI commentator.
 
 ## License
 
