@@ -209,10 +209,41 @@ function postEvent () {
   $('evPlayer').value = ''; $('evMinute').value = ''; $('evDetail').value = ''
 }
 
-// === INIT ===
+// === SPAWNED PEERS ===
+function renderPeerList () {
+  const list = $('peerList')
+  list.innerHTML = ''
+  spawnedPeers.forEach(p => {
+    const row = document.createElement('div')
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 8px;background:var(--panel2);border-radius:7px;font-size:12px'
+    row.innerHTML = `<span style="font-size:14px">${p.flag}</span><span style="flex:1;color:var(--soft)">${esc(p.name)}</span><span style="color:var(--pitch);font-size:10px">● connected</span><button onclick="removePeer('${p.id}')" style="cursor:pointer;border:none;background:none;color:var(--red);font-size:14px;padding:0 4px">×</button>`
+    list.appendChild(row)
+  })
+}
+
+function spawnPeer () {
+  if (!ws) return
+  ws.send(JSON.stringify({ type: 'spawnPeer' }))
+}
+
+function removePeer (id) {
+  if (!ws) return
+  ws.send(JSON.stringify({ type: 'removePeer', id }))
+}
+
+function removeAllPeers () {
+  spawnedPeers.forEach(p => removePeer(p.id))
+}
+
+// Make functions global for inline onclick
+window.removePeer = removePeer
+let spawnedPeers = []   // { id, name, flag }
+
 function connect () {
+  // Connect WebSocket with the current path (so /demo is detected server-side)
   const proto = location.protocol === 'https:' ? 'wss' : 'ws'
-  ws = new WebSocket(`${proto}://${location.host}`)
+  const wsUrl = `${proto}://${location.host}${location.pathname}`
+  ws = new WebSocket(wsUrl)
 
   ws.onopen = () => { sys('Connected to the P2P mesh') }
 
@@ -228,11 +259,26 @@ function connect () {
         $('netPeers').textContent = msg.peers
         renderNetViz(msg.peers)
 
+        // Show demo badge
+        if (demoMode) {
+          const badge = document.createElement('div')
+          badge.className = 'badge live'
+          badge.style.borderColor = 'var(--gold)'; badge.style.color = 'var(--gold)'
+          badge.innerHTML = '<span class="dot" style="background:var(--gold)"></span> Demo Mode'
+          document.querySelector('header').insertBefore(badge, document.querySelector('header .spacer'))
+        }
+
         // AI status
         if (msg.ai) updateAI(msg.ai)
 
         // Existing messages
         if (msg.messages) msg.messages.forEach(renderMessage)
+
+        // Spawned peers from previous sessions
+        if (msg.spawnedPeers) {
+          spawnedPeers = msg.spawnedPeers
+          renderPeerList()
+        }
 
         // Demo seeding
         if (msg.demoChat) {
@@ -294,6 +340,31 @@ function connect () {
       case 'language':
         // language changed
         break
+
+      case 'peerSpawned':
+        spawnedPeers.push(msg.peer)
+        renderPeerList()
+        break
+
+      case 'peerRemoved':
+        spawnedPeers = spawnedPeers.filter(p => p.id !== msg.id)
+        renderPeerList()
+        break
+
+      case 'demoChat':
+        if (msg.chat) {
+          msg.chat.forEach((c, i) => {
+            setTimeout(() => renderMessage({ from: c.from, text: c.text, ts: Date.now() - (msg.chat.length - i) * 5000 }), i * 300)
+          })
+        }
+        if (msg.match) {
+          $('sbHomeName').textContent = msg.match.home
+          $('sbAwayName').textContent = msg.match.away
+          $('sbHomeFlag').textContent = msg.match.homeFlag
+          $('sbAwayFlag').textContent = msg.match.awayFlag
+          $('sbMatch').textContent = msg.match.matchName
+        }
+        break
     }
   }
 
@@ -319,6 +390,8 @@ function updateAI (st) {
 $('sendBtn').onclick = sendChat
 $('chatInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat() })
 $('postEventBtn').onclick = postEvent
+$('addPeerBtn').onclick = spawnPeer
+$('removeAllPeersBtn').onclick = removeAllPeers
 
 // Match clock ticker (cosmetic — advances the displayed minute)
 let displayMinute = 0
