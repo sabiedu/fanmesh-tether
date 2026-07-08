@@ -19,6 +19,7 @@ import { dirname, join, extname } from 'node:path'
 import { WebSocketServer } from 'ws'
 import { MatchRoom } from './mesh.js'
 import { Commentator } from './commentator.js'
+import { DEMO_CHAT, DEMO_EVENTS, DEMO_MATCH } from './demo-scenario.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const WEB = join(__dirname, '..', 'web')
@@ -33,18 +34,21 @@ const MIME = {
 }
 
 export class FanMeshApp {
-  constructor ({ matchKey, storage, name, language, port = 3000, host = '127.0.0.1', model }) {
+  constructor ({ matchKey, storage, name, language, port = 3000, host = '127.0.0.1', model, demo = false }) {
     this.matchKey = matchKey
     this.name = name
     this.language = language || 'English'
     this.port = port
     this.host = host
+    this.demo = demo
     this.room = new MatchRoom({ matchKey, storage, name })
     this.commentator = new Commentator({ language: this.language, model })
     this.clients = new Set()
     this.server = null
     this.wss = null
     this._aiState = { loaded: false, loading: false, pct: 0 }
+    this._demoFired = false
+    this._demoTimer = null
   }
 
   async start ({ ai = true } = {}) {
@@ -68,11 +72,15 @@ export class FanMeshApp {
         this.commentator.attach(this.room)
         this.broadcast({ type: 'ai:ready' })
         console.log('  🤖  On-device commentator ready (QVAC, no cloud).')
+        if (this.demo) this._startDemo()
       }).catch((e) => {
         this._aiState = { loaded: false, loading: false, pct: 0, error: String(e && e.message || e) }
         this.broadcast({ type: 'ai:error', error: this._aiState.error })
         console.error('  ⚠️  Commentator failed to load:', this._aiState.error)
       })
+    } else if (this.demo) {
+      // Demo mode without AI — still seed events for UI
+      setTimeout(() => this._startDemo(), 3000)
     }
     return this
   }
@@ -127,7 +135,10 @@ export class FanMeshApp {
       peers: this.room.peerCount,
       ai: this._aiState,
       language: this.language,
-      messages: this.room.allMessages ? await this.room.allMessages() : []
+      messages: this.room.allMessages ? await this.room.allMessages() : [],
+      demo: this.demo,
+      demoChat: this.demo ? DEMO_CHAT : null,
+      demoMatch: this.demo ? DEMO_MATCH : null
     }))
     ws.on('message', async (raw) => {
       let msg
@@ -173,6 +184,32 @@ export class FanMeshApp {
     })
     ws.on('close', () => this.clients.delete(ws))
     ws.on('error', () => this.clients.delete(ws))
+  }
+
+  _startDemo () {
+    if (this._demoFired) return
+    this._demoFired = true
+    console.log('  🎬  Demo mode: seeding World Cup Final scenario…')
+
+    // Send match metadata to all clients
+    this.broadcast({ type: 'demoMatch', match: DEMO_MATCH })
+
+    // Fire each event on its scheduled delay
+    for (const ev of DEMO_EVENTS) {
+      const fire = () => {
+        const fullEv = { id: `demo-${ev.minute}-${ev.kind}`, ...ev }
+        // Post through the REAL Autobase mesh (genuine P2P path)
+        // The 'match' listener in _wireRoom will broadcast it to clients
+        this.room.postMatchEvent(fullEv)
+        // Update score on the scoreboard
+        if (ev.score) {
+          const [h, a] = ev.score.split('-')
+          this.broadcast({ type: 'score', home: parseInt(h), away: parseInt(a), minute: ev.minute })
+        }
+        console.log(`  ⚽  Demo event: ${ev.minute}' ${ev.kind} ${ev.player || ''}`)
+      }
+      setTimeout(fire, ev.delayMs)
+    }
   }
 
   _wireCommentary () {

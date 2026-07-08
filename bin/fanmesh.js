@@ -23,13 +23,14 @@ const language = arg('lang', 'English')
 const port = Number(arg('port', '3000'))
 const storage = arg('storage', path.join(os.tmpdir(), 'fanmesh', name))
 const useAI = !flag('no-ai')
+const demo = flag('demo')
 
 process.on('SIGINT', shutdown)
 process.on('SIGTERM', shutdown)
 
 let app
 async function main () {
-  app = await new FanMeshApp({ matchKey, storage, name, language, port }).start({ ai: useAI })
+  app = await new FanMeshApp({ matchKey, storage, name, language, port, demo }).start({ ai: useAI })
 }
 async function shutdown () {
   console.log('\n  shutting down…')

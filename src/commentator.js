@@ -54,6 +54,16 @@ const VERBS = {
 function humanize (ev) {
   const min = ev.minute != null ? `${ev.minute}'` : ''
   const who = ev.player || ev.team || 'A team'
+
+  // When a rich detail is provided, make it the centerpiece — this is what
+  // lets the AI produce vivid, specific commentary instead of generic filler.
+  if (ev.detail) {
+    let s = `${min} ${ev.detail}`
+    if (ev.player) s = `${min} ${ev.player} (${ev.team || ''}) — ${ev.detail}`
+    if (ev.score) s += ` Score is now ${ev.score}.`
+    return s
+  }
+
   if (ev.kind === 'kickoff' || ev.kind === 'halftime' || ev.kind === 'fulltime' || ev.kind === 'var') {
     const base = VERBS[ev.kind] || `— event: ${ev.kind}`
     return `${min} ${who} ${base}.`
@@ -62,7 +72,6 @@ function humanize (ev) {
   let s = `${min} ${who} ${verb}.`
   if (ev.team && ev.player) s += ` (${ev.team})`
   if (ev.score) s += ` Score is now ${ev.score}.`
-  if (ev.detail) s += ` ${ev.detail}`
   return s
 }
 
@@ -70,7 +79,7 @@ function humanize (ev) {
  * On-device AI commentator. Generates live match calls locally with QVAC.
  */
 export class Commentator extends EventEmitter {
-  constructor ({ language = 'English', style = 'passionate stadium commentator', model, maxContext = 4, maxTokens = 96, temperature = 0.7 } = {}) {
+  constructor ({ language = 'English', style = 'passionate stadium commentator', model, maxContext = 4, maxTokens = 150, temperature = 0.75 } = {}) {
     super()
     this.language = String(language || 'English').trim()
     this.style = style
@@ -117,11 +126,13 @@ export class Commentator extends EventEmitter {
 
   _systemPrompt () {
     return [
-      `You are a ${this.style} calling a live football match on the radio.`,
-      `Reply ONLY in ${this.language}, in at most TWO short sentences (under 40 words).`,
-      `React to exactly the event described — name the player, team and minute.`,
-      `Do NOT invent a scoreline, scorers or minutes that were not given.`,
-      `Be vivid and energetic. Plain text only: no hashtags, no quotes, no markdown, no preamble.`
+      `You are a ${this.style} broadcasting a live football match.`,
+      `Reply ONLY in ${this.language}.`,
+      `Write 2 to 4 vivid, energetic sentences that capture the drama of the moment.`,
+      `If details are given about HOW it happened, use them — describe the skill, the build-up, the emotion in the stadium.`,
+      `Do NOT invent players, minutes, or scores that were not stated.`,
+      `Sound like a real radio commentator: present tense, breathless excitement, painting the scene.`,
+      `Plain text only: no hashtags, no quotes, no markdown, no preamble, no repetition.`
     ].join(' ')
   }
 
