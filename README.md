@@ -42,7 +42,10 @@ During the World-Cup moment, central chat servers overload and fans in some regi
 - ✅ **Milestone 1** — Hyperswarm peer discovery verified (two peers find each other + exchange messages over the DHT, no server).
 - ✅ **Milestone 2** — Autobase multi-writer chat (both directions) + reactions + **Hypercore clip sync (symmetric, byte-identical)** + eventual consistency. All P2P, no server.
 - ✅ **Milestone 3** — QVAC on-device commentator runs a real Llama 3.2 1B model locally (no cloud) and generates live multilingual commentary on match events.
-- 🚧 Milestone 4 — Web UI + demo video (in progress).
+- ✅ **Milestone 4** — Web UI + 10-slide pitch deck (`web/slides.html`) + SUBMISSION.md.
+
+## Pitch deck
+Open [`web/slides.html`](web/slides.html) in a browser — use ← → or click the edges to navigate the 10-slide deck.
 
 ## Quick start
 

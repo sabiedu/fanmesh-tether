@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>FanMesh — Demo Reel (auto-play, 1280×720)</title>
+<style>
+/* Auto-playing demo reel for screen-recording the demo video.
+   Open in browser, resize to 1280×720, hit fullscreen (F), record.
+   Cycles: title → problem → solution → architecture → pears → qvac →
+           verified → screenshots → pitch slides → closing. Loops. */
+:root{
+  --bg:#0a0f0d; --ink:#eaf3ee; --soft:#b4c7bd; --muted:#7a9088; --line:#1f2d27;
+  --pitch:#19c98a; --gold:#f5c451; --blue:#5db4ff;
+  --grad:linear-gradient(135deg,#19c98a 0%,#f5c451 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;width:100%;overflow:hidden}
+body{font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;letter-spacing:-.012em}
+.stage{position:fixed;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:48px 64px;text-align:center}
+.frame{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;align-items:center;
+  padding:40px 60px;text-align:center}
+.frame.on{display:flex}
+.kicker{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.22em;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:18px}
+.big{font-size:58px;font-weight:825;line-height:1.05;letter-spacing:-.03em}
+.grad-txt{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--soft);font-size:20px;font-weight:500;margin-top:18px;max-width:760px;line-height:1.5}
+.brand-mark{font-size:72px}
+.emoji-row{font-size:48px;margin-top:24px;letter-spacing:12px}
+.panel{background:#121a17;border:1px solid var(--line);border-radius:16px;padding:22px 26px;margin-top:24px;max-width:720px}
+.panel p{font-size:19px;font-weight:600;line-height:1.55;color:var(--soft)}
+.row3{display:flex;gap:18px;margin-top:26px}
+.card{background:#121a17;border:1px solid #2a3d34;border-radius:16px;padding:20px 18px;width:230px}
+.card .tag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:3px 9px;border-radius:7px;display:inline-block;margin-bottom:9px}
+.card.t1 .tag{background:rgba(25,201,138,.14);color:var(--pitch)}
+.card.t2 .tag{background:rgba(93,180,255,.14);color:var(--blue)}
+.card.t3 .tag{background:rgba(245,196,81,.14);color:var(--gold)}
+.card.t4 .tag{background:rgba(255,107,107,.14);color:#ff6b6b}
+.card h4{font-size:16px;font-weight:760}
+.card p{font-size:13px;color:var(--muted);margin-top:7px;line-height:1.45}
+.checklist{text-align:left;margin-top:24px;max-width:680px;width:100%}
+.checklist .row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.checklist .chk{color:var(--pitch);font-weight:900;font-size:18px;flex-shrink:0;width:24px}
+.checklist .txt{font-size:17px;color:var(--soft);line-height:1.45}
+.checklist .txt b{color:var(--ink)}
+.shotwrap{margin-top:16px;border:2px solid var(--line);border-radius:14px;overflow:hidden;max-width:900px;width:100%}
+.shotwrap img{width:100%;display:block;border-radius:12px}
+.shotcap{font-size:14px;color:var(--muted);margin-top:10px;font-weight:600}
+.badges{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;justify-content:center}
+.bdg{background:#121a17;border:1px solid #2a3d34;border-radius:12px;padding:10px 16px;font-size:14px;font-weight:700}
+.bdg .chk{color:var(--pitch);font-weight:900}
+/* progress dots */
+.dots{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:99}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.3s}
+.dot.on{background:var(--pitch);width:26px;border-radius:5px}
+/* timer bar */
+.timer{position:fixed;top:0;left:0;height:3px;background:var(--grad);z-index:99}
+</style>
+</head>
+<body>
+<div class="timer" id="timer" style="width:0"></div>
+
+<!-- 1 TITLE -->
+<div class="frame on" data-sec="6">
+  <div class="brand-mark">⚽</div>
+  <h1 class="big" style="margin-top:14px">FanMesh</h1>
+  <p class="sub"><span class="grad-txt" style="font-weight:700">P2P Fan Network</span> + <span style="color:var(--blue);font-weight:700">On-Device AI Commentator</span></p>
+  <p class="sub" style="font-size:16px;margin-top:24px">No server. No cloud. No censorship. Anywhere.</p>
+</div>
+
+<!-- 2 PROBLEM -->
+<div class="frame" data-sec="6">
+  <div class="kicker">The Problem</div>
+  <h1 class="big" style="font-size:72px">5B+ fans</h1>
+  <p class="sub">watch the World Cup — but the experience breaks at the worst moment.</p>
+  <div class="panel"><p>Central chat servers <span class="grad-txt" style="font-weight:800">overload and crash</span>. Fans get <span class="grad-txt" style="font-weight:800">censored</span>. Cloud AI dies when the connection drops.</p></div>
+</div>
+
+<!-- 3 SOLUTION -->
+<div class="frame" data-sec="6">
+  <div class="kicker">The Solution</div>
+  <h1 class="big" style="font-size:52px">Remove the server.<br><span class="grad-txt">Entirely.</span></h1>
+  <p class="sub">Fans discover each other peer-to-peer, chat with no middleman, and run a private AI commentator on their own device.</p>
+  <div class="emoji-row">👤 → 🏟️ ← 📱</div>
+</div>
+
+<!-- 4 TRACKS -->
+<div class="frame" data-sec="7">
+  <div class="kicker">Two Tether Cup Tracks</div>
+  <h1 class="big" style="font-size:52px">Pears <span style="color:var(--muted)">+</span> QVAC</h1>
+  <div class="row3">
+    <div class="card t1"><div class="tag">Discovery</div><h4>Hyperswarm</h4><p>Peer discovery by match name. No signalling server.</p></div>
+    <div class="card t2"><div class="tag">Shared State</div><h4>Autobase</h4><p>Multi-writer, eventually-consistent room state.</p></div>
+    <div class="card t3"><div class="tag">Clip Sync</div><h4>Hypercore</h4><p>Append-only clips, replicated P2P, byte-identical.</p></div>
+  </div>
+  <div class="row3" style="margin-top:0">
+    <div class="card t4" style="width:230px"><div class="tag">Local AI</div><h4>QVAC Commentator</h4><p>Llama 3.2 1B runs on YOUR device. No cloud, no API key.</p></div>
+  </div>
+</div>
+
+<!-- 5 ARCHITECTURE -->
+<div class="frame" data-sec="7">
+  <div class="kicker">Architecture</div>
+  <h1 class="big" style="font-size:46px">Every layer is <span class="grad-txt">decentralized</span></h1>
+  <div class="row3">
+    <div class="card t1"><div class="tag">Layer 1</div><h4>Hyperswarm DHT</h4><p>Deterministic topic hash from match name. Race-free room creation.</p></div>
+    <div class="card t2"><div class="tag">Layer 2</div><h4>Autobase Merge</h4><p>Pure reducer linearises every writer into one ordered view.</p></div>
+    <div class="card t3"><div class="tag">Layer 3</div><h4>QVAC Local AI</h4><p>Streams live commentary from match events. Sovereign &amp; private.</p></div>
+  </div>
+  <p class="sub" style="font-size:16px;margin-top:24px">Split-brain healing: peers auto-migrate to the smallest discovery-key room.</p>
+</div>
+
+<!-- 6 QVAC -->
+<div class="frame" data-sec="6">
+  <div class="kicker">QVAC — Your Private Commentator</div>
+  <h1 class="big" style="font-size:50px">A real LLM<br><span style="color:var(--blue)">in your pocket</span></h1>
+  <div class="panel"><p>Llama 3.2 1B runs locally via @qvac/sdk. Loads in ~2s. Live calls in English, Español &amp; more — <span class="grad-txt" style="font-weight:800">streamed token-by-token</span>. Zero cloud calls.</p></div>
+  <p class="sub" style="font-size:17px;margin-top:22px">Censor the network? Fans still talk. Kill the cloud? The AI still commentates.</p>
+</div>
+
+<!-- 7 VERIFIED -->
+<div class="frame" data-sec="7">
+  <div class="kicker">Verified &amp; Working</div>
+  <h1 class="big" style="font-size:48px">Three milestones <span class="grad-txt">passing</span></h1>
+  <div class="checklist">
+    <div class="row"><span class="chk">✓</span><span class="txt"><b>Milestone 1 — Peer Discovery:</b> Two peers find each other over the DHT. No server.</span></div>
+    <div class="row"><span class="chk">✓</span><span class="txt"><b>Milestone 2 — Multi-Writer Mesh:</b> Autobase chat both ways + reactions + Hypercore clip sync (byte-identical).</span></div>
+    <div class="row"><span class="chk">✓</span><span class="txt"><b>Milestone 3 — On-Device AI:</b> QVAC loads Llama 3.2 1B locally, generates live multilingual commentary. No cloud.</span></div>
+  </div>
+</div>
+
+<!-- 8 SCREENSHOT ALICE PEERS -->
+<div class="frame" data-sec="6">
+  <div class="kicker">Live: Two Peers Connected</div>
+  <h1 class="big" style="font-size:42px">Alice (EN) ↔ Bob (ES) <span class="grad-txt">P2P</span></h1>
+  <div class="shotwrap"><img src="docs/screenshot-alice-peers.png" alt="Alice connected to Bob P2P" /></div>
+  <p class="shotcap">Alice discovers Bob over Hyperswarm DHT — no server in between</p>
+</div>
+
+<!-- 9 SCREENSHOT COMMENTARY -->
+<div class="frame" data-sec="6">
+  <div class="kicker">Live: On-Device AI Commentary</div>
+  <h1 class="big" style="font-size:42px">QVAC generates <span style="color:var(--gold)">live calls</span></h1>
+  <div class="shotwrap"><img src="docs/screenshot-commentary.png" alt="QVAC live commentary" /></div>
+  <p class="shotcap">Multilingual commentary streamed locally — zero cloud calls</p>
+</div>
+
+<!-- 10 SCREENSHOT BOB ES -->
+<div class="frame" data-sec="6">
+  <div class="kicker">Live: Spanish Commentary</div>
+  <h1 class="big" style="font-size:42px">Every fan, their <span style="color:var(--blue)">own language</span></h1>
+  <div class="shotwrap"><img src="docs/screenshot-bob-goal-es.png" alt="Bob Spanish goal commentary" /></div>
+  <p class="shotcap">Bob gets the same match narrated in Español — fully on-device</p>
+</div>
+
+<!-- 11 CLOSING -->
+<div class="frame" data-sec="7">
+  <div class="brand-mark">⚽</div>
+  <h1 class="big" style="margin-top:12px">FanMesh</h1>
+  <p class="sub">The fan network that can't be shut down.</p>
+  <div class="badges">
+    <div class="bdg"><span class="chk">✓</span> Pears Stack</div>
+    <div class="bdg"><span class="chk">✓</span> QVAC Local AI</div>
+    <div class="bdg"><span class="chk">✓</span> No Server</div>
+    <div class="bdg"><span class="chk">✓</span> Tests Passing</div>
+  </div>
+  <p class="sub" style="font-size:16px;margin-top:22px">Built for the Tether Developers Cup · github.com/sabiedu/fanmesh-tether</p>
+</div>
+
+<div class="dots" id="dots"></div>
+
+<script>
+const frames=[...document.querySelectorAll('.frame')];
+let idx=0,elapsed=0;
+const dotsEl=document.getElementById('dots');
+const timer=document.getElementById('timer');
+frames.forEach(()=>{const d=document.createElement('div');d.className='dot';dotsEl.appendChild(d);});
+const dots=[...document.querySelectorAll('.dot')];
+const durations=frames.map(f=>parseInt(f.dataset.sec||6)*1000);
+
+function show(n){
+  frames.forEach((f,i)=>f.classList.toggle('on',i===n));
+  dots.forEach((d,i)=>d.classList.toggle('on',i===n));
+  timer.style.width='0';
+  elapsed=0;
+}
+show(0);
+
+let last=performance.now();
+function loop(now){
+  const dt=now-last; last=now;
+  elapsed+=dt;
+  const dur=durations[idx];
+  timer.style.width=Math.min(100,elapsed/dur*100)+'%';
+  if(elapsed>=dur){
+    idx=(idx+1)%frames.length;
+    show(idx);
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
