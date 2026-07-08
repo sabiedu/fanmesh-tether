@@ -163,6 +163,15 @@
   /* Score change animation */
   .sb-score.bump{animation:scorebump .5s ease}
   @keyframes scorebump{0%{transform:scale(1)}40%{transform:scale(1.3);color:var(--gold)}100%{transform:scale(1)}}
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  .peer-chip{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--panel2);border-radius:7px;font-size:12px;transition:all .2s}
+  .peer-chip:hover{background:var(--panel3)}
+  .peer-flag{font-size:14px}
+  .peer-name{flex:1;color:var(--soft)}
+  .peer-status{color:var(--pitch);font-size:10px}
+  .peer-remove{cursor:pointer;border:none;background:none;color:var(--red);font-size:14px;padding:0 4px;opacity:.5;transition:opacity .2s}
+  .peer-remove:hover{opacity:1}
+  #addPeerBtn:disabled{cursor:wait;opacity:.7}
 </style>
 </head>
 <body>

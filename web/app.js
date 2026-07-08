@@ -210,21 +210,44 @@ function postEvent () {
 }
 
 // === SPAWNED PEERS ===
+let spawnedPeers = []   // { id, name, flag }
+
 function renderPeerList () {
   const list = $('peerList')
   list.innerHTML = ''
   spawnedPeers.forEach(p => {
     const row = document.createElement('div')
-    row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 8px;background:var(--panel2);border-radius:7px;font-size:12px'
-    row.innerHTML = `<span style="font-size:14px">${p.flag}</span><span style="flex:1;color:var(--soft)">${esc(p.name)}</span><span style="color:var(--pitch);font-size:10px">● connected</span><button onclick="removePeer('${p.id}')" style="cursor:pointer;border:none;background:none;color:var(--red);font-size:14px;padding:0 4px">×</button>`
+    row.className = 'peer-chip'
+    row.innerHTML = `<span class="peer-flag">${p.flag}</span><span class="peer-name">${esc(p.name)}</span><span class="peer-status">● connected</span><button class="peer-remove" onclick="removePeer('${p.id}')">×</button>`
     list.appendChild(row)
   })
 }
 
 function spawnPeer () {
-  if (!ws) return
+  if (!ws || ws.readyState !== 1) return
+  // Immediate visual feedback — button transforms to show spawning
+  var btn = $('addPeerBtn')
+  var orig = btn.innerHTML
+  btn.disabled = true
+  btn.innerHTML = '<span style="display:inline-block;animation:spin 0.8s linear infinite">⟳</span> Spawning real peer…'
+  btn.style.opacity = '0.7'
+  
   ws.send(JSON.stringify({ type: 'spawnPeer' }))
+  
+  // Restore button after peer connects or timeout
+  var restored = false
+  function restore () {
+    if (restored) return
+    restored = true
+    btn.disabled = false
+    btn.innerHTML = orig
+    btn.style.opacity = '1'
+  }
+  setTimeout(restore, 8000) // fallback restore
 }
+
+// Listen for peerSpawned to restore button
+var _origRenderPeerList = renderPeerList
 
 function removePeer (id) {
   if (!ws) return
@@ -237,7 +260,6 @@ function removeAllPeers () {
 
 // Make functions global for inline onclick
 window.removePeer = removePeer
-let spawnedPeers = []   // { id, name, flag }
 
 function connect () {
   // Connect WebSocket with the current path (so /demo is detected server-side)
@@ -344,6 +366,16 @@ function connect () {
       case 'peerSpawned':
         spawnedPeers.push(msg.peer)
         renderPeerList()
+        // Restore button if it's in spawning state
+        {
+          let btn = $('addPeerBtn')
+          if (btn.disabled) { btn.disabled = false; btn.innerHTML = '＋ Add Fan to Room'; btn.style.opacity = '1' }
+        }
+        // Flash the peer count
+        $('netPeers').style.transition = 'transform 0.3s, color 0.3s'
+        $('netPeers').style.transform = 'scale(1.5)'
+        $('netPeers').style.color = 'var(--pitch)'
+        setTimeout(() => { $('netPeers').style.transform = ''; $('netPeers').style.color = '' }, 600)
         break
 
       case 'peerRemoved':
@@ -383,6 +415,11 @@ function updateAI (st) {
     bar.style.width = (st.pct || 0) + '%'
   } else if (st.error) {
     status.textContent = 'Error: ' + st.error.slice(0, 40)
+  } else if (!st.loaded && !st.loading && !st.error) {
+    // AI not enabled (--no-ai) — show as optional, not broken
+    status.textContent = 'Disabled (demo mode)'
+    bar.style.width = '100%'
+    bar.style.opacity = '0.3'
   }
 }
 

@@ -125,7 +125,13 @@ export class FanMeshApp {
         const filePath = join(WEB, p)
         if (!filePath.startsWith(WEB)) { res.statusCode = 403; return res.end('forbidden') }
         const data = await readFile(filePath)
-        res.writeHead(200, { 'Content-Type': MIME[extname(filePath)] || 'application/octet-stream' })
+        const ext = extname(filePath)
+        const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream' }
+        // Never cache JS/CSS/HTML — always serve fresh during development
+        if (ext === '.js' || ext === '.css' || ext === '.html') {
+          headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        }
+        res.writeHead(200, headers)
         res.end(data)
       } catch (e) {
         res.statusCode = 404
